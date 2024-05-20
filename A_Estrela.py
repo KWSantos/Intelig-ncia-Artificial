@@ -1,9 +1,9 @@
-class Estado:
+class State:
 
     def __init__(self, name : str, h : int):
         self.name = name
-        self.opened = False
-        self.closed = False
+        self.opened = None
+        self.closed = None
         self.adjacents = []
         self.h = h
         self.g = 0
@@ -12,105 +12,101 @@ class Estado:
 
     def open(self):
         self.opened = True
+        self.closed = False
     
     def close(self):
         self.closed = True
-    
-    def getAdjacents(self):
-        return self.adjacents
+        self.opened = False
 
-def bestVertex(open : set):
+def printGraph(graph : list):
+    for state in graph:
+        print(state.name, end=": [")
+        for ad in state.adjacents:
+            print(f" {ad[0].name}", end="")
+        print(" ]")
+
+def pathToVertex(origin: State, destiny : State):
+    if destiny.dad != origin:
+        pathToVertex(origin, destiny.dad)
+    print(f" -> [{destiny.name}]", end="")
+
+def bestVertex(graph : list):
     menorF = 100
     stateF = None
-    for i in open:
-        if i.f < menorF:
+    for i in graph:
+        if i.opened and i.f < menorF:
             menorF = i.f
             stateF = i
     return stateF
 
-def aEstrela(s : Estado, t : Estado):
-    open = set([])
-    closed = set([])
+def aEstrela(graph, initial : State, destiny : State):
     novoF = 0
-    s.g = 0
-    s.f = s.g + s.h
-    v = s
-    open.add(s)
-    while open != {}:
-        v = bestVertex(open)
-        print(v.name)
-        if v == t:
+    initial.f = initial.g + initial.h
+    initial.open()
+    v = initial
+    while v != destiny:
+        v = bestVertex(graph)
+        if v == destiny:
             return True
         for u in v.adjacents:
             novoF = v.g + u[1] + u[0].h
-            
-            if not ((u[0] in closed or u[0] in open) and novoF >= u[0].f):
+            if not ((u[0].closed or u[0].opened) and novoF >= u[0].f):
                 u[0].dad = v
                 u[0].g = v.g + u[1]
                 u[0].f = novoF
 
-                if u[0] in closed:
-                    closed.remove(u[0])
+                if u[0].closed:
+                    u[0].open()
                 
-                if u[0] in open:
-                    open.remove(u[0])
+                if u[0].opened:
+                    u[0].close()
 
-                open.add(u[0])
-        
-        open.remove(v)
-        closed.add(v)
+                u[0].open()
+        v.close()
     return False
 
 
 def main():
 
-    f = Estado("F", 10)
-    g = Estado("G", 10)
-    a = Estado("A", 10)
-    b = Estado("B", 20)
-    c = Estado("C", 10)
-    d = Estado("D", 5)
-    e = Estado("E", 10)
-    h = Estado("H", 0)
-    k = Estado("K", 0)
+    f = State("F", 10)
+    g = State("G", 10)
+    a = State("A", 10)
+    b = State("B", 20)
+    c = State("C", 10)
+    d = State("D", 5)
+    e = State("E", 10)
+    h = State("H", 0)
+    k = State("K", 0)
 
     f.adjacents.append((g, 15))
-    f.adjacents.append((b, 5))
-    g.adjacents.append((f, 15))
     g.adjacents.append((a, 10))
-    g.adjacents.append((d, 10))
     g.adjacents.append((c, 5))
-    a.adjacents.append((g, 10))
     a.adjacents.append((d, 10))
     a.adjacents.append((b, 5))
-    a.adjacents.append((e, 5))
     a.adjacents.append((h, 10))
     b.adjacents.append((f, 5))
-    b.adjacents.append((a, 5))
-    b.adjacents.append((h, 5))
-    b.adjacents.append((k, 10))
-    c.adjacents.append((g, 5))
     c.adjacents.append((d, 5))
-    c.adjacents.append((e, 10))
     d.adjacents.append((g, 10))
-    d.adjacents.append((a, 10))
-    d.adjacents.append((c, 5))
     d.adjacents.append((e, 5))
     e.adjacents.append((c, 10))
-    e.adjacents.append((d, 5))
     e.adjacents.append((a, 5))
     e.adjacents.append((k, 10))
-    h.adjacents.append((a, 10))
     h.adjacents.append((b, 5))
     h.adjacents.append((k, 20))
-    k.adjacents.append((e, 10))
-    k.adjacents.append((h, 20))
     k.adjacents.append((b, 10))
 
-    if aEstrela(g, k):
-        print("E possivel")
+    graph = [a, b, c, d, e, f, g, h, k]
+
+    print("Grafo:")
+    printGraph(graph)
+    print()
+
+    if aEstrela(graph, g, k):
+        print("Caminho: ", end="")
+        print(f"[{g.name}]", end="")
+        pathToVertex(g, k)
     else:
-        print("Nao e possivel")
+        print(f"Nao e possivel partir do vertice {g.name} e ir ao {k.name}")
 
 if __name__=="__main__":
     main()
