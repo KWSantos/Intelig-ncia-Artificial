@@ -33,10 +33,13 @@ def pathToVertex(origin: State, destiny : State):
 def bestVertex(graph : list):
     menorF = 100
     stateF = None
+    print("Nos abertos:", end=" ")
     for i in graph:
         if i.opened and i.f < menorF:
+            print(f"[{i.name}]", end=" ")
             menorF = i.f
             stateF = i
+    print()
     return stateF
 
 def aEstrela(graph, initial : State, destiny : State):
@@ -46,6 +49,7 @@ def aEstrela(graph, initial : State, destiny : State):
     v = initial
     while v != destiny:
         v = bestVertex(graph)
+        print(f"No escolhido: [{v.name}]\n")
         if v == destiny:
             return True
         for u in v.adjacents:
