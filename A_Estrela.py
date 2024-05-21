@@ -42,7 +42,7 @@ def bestVertex(graph : list):
     print()
     return stateF
 
-def aEstrela(graph, initial : State, destiny : State):
+def aStar(graph, initial : State, destiny : State):
     novoF = 0
     initial.f = initial.g + initial.h
     initial.open()
@@ -105,7 +105,7 @@ def main():
     printGraph(graph)
     print()
 
-    if aEstrela(graph, g, k):
+    if aStar(graph, g, k):
         print("Caminho: ", end="")
         print(f"[{g.name}]", end="")
         pathToVertex(g, k)
