@@ -105,6 +105,7 @@ def main():
         print("Caminho: ", end="")
         print(f"[{g.name}]", end="")
         pathToVertex(g, k)
+        print("\nCusto total para chegar no No de destino:", k.f)
     else:
         print(f"Nao e possivel partir do vertice {g.name} e ir ao {k.name}")
 
